@@ -5,13 +5,17 @@ import LoginScreen from '../screens/LoginScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 import GuestCameraScreen from '../screens/GuestCameraScreen';
+import QRScannerScreen from '../screens/QRScannerScreen';
+import InstructionsScreen from '../screens/InstructionsScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined;
   Dashboard: undefined;
-  EventDetail: { weddingId: string } | undefined;
-  GuestCamera: { weddingId: string } | undefined;
+  EventDetail: { weddingId: string };
+  GuestCamera: { weddingId: string };
+  QRScanner: undefined;
+  Instructions: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -24,6 +28,8 @@ export default function RootNavigator() {
       <Stack.Screen name="Dashboard" component={DashboardScreen} />
       <Stack.Screen name="EventDetail" component={EventDetailScreen} />
       <Stack.Screen name="GuestCamera" component={GuestCameraScreen} />
+      <Stack.Screen name="QRScanner" component={QRScannerScreen} />
+      <Stack.Screen name="Instructions" component={InstructionsScreen} />
     </Stack.Navigator>
   );
 }

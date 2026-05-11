@@ -1,20 +1,58 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { selectionHaptic } from '../utils/haptics';
 
 type Props = {
   title: string;
   onPress?: () => void;
   loading?: boolean;
-  style?: any;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  style?: ViewStyle;
 };
 
-export default function Button({ title, onPress, loading, style }: Props) {
-  const { palette } = useTheme() as any;
+export default function Button({ title, onPress, loading, variant = 'primary', style }: Props) {
+  const { palette, typography } = useTheme() as any;
+
+  const handlePress = async () => {
+    if (loading || !onPress) return;
+    await selectionHaptic();
+    onPress();
+  };
+
   return (
-    <TouchableOpacity style={[styles.button, { backgroundColor: palette.accent }, style]} onPress={onPress} activeOpacity={0.8}>
-      {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>{title}</Text>}
-    </TouchableOpacity>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: loading }}
+      disabled={loading}
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.button,
+        variant === 'primary' && { backgroundColor: palette.accent },
+        variant === 'secondary' && {
+          backgroundColor: 'transparent',
+          borderColor: palette.primary,
+          borderWidth: 1,
+        },
+        variant === 'ghost' && { backgroundColor: 'transparent' },
+        { opacity: pressed || loading ? 0.78 : 1 },
+        style,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={variant === 'primary' ? '#fff' : palette.accent} />
+      ) : (
+        <Text
+          style={[
+            styles.text,
+            typography.label,
+            { color: variant === 'primary' ? '#fff' : palette.primary },
+          ]}
+        >
+          {title}
+        </Text>
+      )}
+    </Pressable>
   );
 }
 
@@ -25,6 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 48,
   },
-  text: { color: '#fff', fontWeight: '600' },
+  text: { fontSize: 14, fontWeight: '700', textTransform: 'uppercase' },
 });
