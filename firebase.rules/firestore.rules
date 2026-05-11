@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /weddings/{weddingId} {
+      allow read: if true; // public read for event meta
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.createdBy;
+      allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /photos/{photoId} {
+      allow create: if true; // allow guests to upload via client (storage + firestore)
+      allow read: if true;
+      allow delete: if request.auth != null && get(/databases/$(database)/documents/photos/$(photoId)).data.createdBy == request.auth.uid;
+    }
+  }
+}
