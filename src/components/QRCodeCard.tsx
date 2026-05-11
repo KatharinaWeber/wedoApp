@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function QRCodeCard({ code, title = 'Guest Link' }: { code: string; title?: string }) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   return (
     <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
       <Text style={[styles.title, typography.label, { color: palette.muted }]}>{title}</Text>

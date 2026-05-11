@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Button from '../components/Button';
@@ -16,7 +16,7 @@ export default function EventDetailScreen({ route, navigation }: any) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
 
   const shareCode = useMemo(() => `wedo://event/${weddingId}`, [weddingId]);
 

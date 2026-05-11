@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function FloatingActionButton({ onPress }: { onPress?: () => void }) {
-  const { palette } = useTheme() as any;
+  const { palette } = useTheme();
   return (
     <TouchableOpacity style={[styles.fab, { backgroundColor: palette.accent }]} onPress={onPress}>
       <Text style={{ color: '#fff', fontSize: 28 }}>+</Text>

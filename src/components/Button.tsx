@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { selectionHaptic } from '../utils/haptics';
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function Button({ title, onPress, loading, variant = 'primary', style }: Props) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
 
   const handlePress = async () => {
     if (loading || !onPress) return;

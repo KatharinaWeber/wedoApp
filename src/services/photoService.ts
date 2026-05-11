@@ -1,6 +1,7 @@
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../firebase/firebase';
+import { Photo } from '../types';
 
 type UploadedBy = 'guest' | 'photographer';
 
@@ -60,7 +61,7 @@ export const getPhotosByWedding = async (weddingId: string) => {
   const q = query(collection(db, 'photos'), where('weddingId', '==', weddingId));
   const snap = await getDocs(q);
   return snap.docs
-    .map((document) => ({ id: document.id, ...(document.data() as any) }))
+    .map((document) => ({ id: document.id, ...document.data() } as Photo))
     .sort((a, b) => {
       const left = a.createdAt?.toMillis?.() || 0;
       const right = b.createdAt?.toMillis?.() || 0;

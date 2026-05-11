@@ -1,11 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import { TextInput, StyleSheet, View, Text, TextInputProps } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 type Props = TextInputProps & { label?: string; error?: string | null };
 
 export default function Input({ label, error, style, ...inputProps }: Props) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   return (
     <View style={styles.wrap}>
       {label ? <Text style={[styles.label, typography.label, { color: palette.muted }]}>{label}</Text> : null}

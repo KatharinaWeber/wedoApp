@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,7 +19,7 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const auth = useAuth();
   const nav = useNavigation<LoginNavigation>();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
 
   const submit = async () => {
     setError(null);

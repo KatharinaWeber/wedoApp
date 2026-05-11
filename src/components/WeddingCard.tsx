@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function WeddingCard({ title, date, photoCount, onPress }: any) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"

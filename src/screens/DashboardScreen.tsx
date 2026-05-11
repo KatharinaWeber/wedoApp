@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -24,7 +24,7 @@ export default function DashboardScreen() {
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
   const nav = useNavigation<DashboardNavigation>();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
 
   const featured = useMemo(() => weddings[0], [weddings]);
   const seasonPhotoCount = useMemo(

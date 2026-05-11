@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { FlatList, Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeContext';
@@ -7,7 +7,7 @@ const col = 3;
 
 export default function PhotoGrid({ photos, onDelete }: any) {
   const { width } = useWindowDimensions();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   const size = Math.floor((width - 56) / col);
 
   if (!photos?.length) {

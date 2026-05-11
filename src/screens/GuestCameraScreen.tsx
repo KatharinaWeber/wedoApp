@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -28,7 +28,7 @@ type CaptureState = 'idle' | 'saving' | 'success' | 'error';
 export default function GuestCameraScreen({ route, navigation }: any) {
   const weddingId: string | undefined = route?.params?.weddingId;
   const [eventTitle, setEventTitle] = useState<string>('');
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   const cameraRef = useRef<CameraView | null>(null);
   const shutterScale = useRef(new Animated.Value(1)).current;
   const pulseOpacity = useRef(new Animated.Value(0.35)).current;

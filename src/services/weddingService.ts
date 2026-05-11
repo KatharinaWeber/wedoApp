@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc, getCountFromServer } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
 export type Wedding = {
@@ -27,18 +27,18 @@ export const createWedding = async (title: string, createdBy: string, date = '',
 export const getWeddingsByUser = async (uid: string) => {
   const q = query(collection(db, 'weddings'), where('createdBy', '==', uid));
   const snap = await getDocs(q);
-  const weddings = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+  const weddings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   const counts = await Promise.all(
     weddings.map(async (wedding) => {
       const photosQuery = query(collection(db, 'photos'), where('weddingId', '==', wedding.id));
-      const photos = await getDocs(photosQuery);
-      return { id: wedding.id, photoCount: photos.size };
+      const countSnap = await getCountFromServer(photosQuery);
+      return { id: wedding.id, photoCount: countSnap.data().count };
     }),
   );
 
   return weddings.map((wedding) => ({
     ...wedding,
-    photoCount: counts.find((count) => count.id === wedding.id)?.photoCount || 0,
+    photoCount: counts.find((count) => count.id === wedding.id)?.photoCount ?? 0,
   }));
 };
 
@@ -50,5 +50,5 @@ export const getWeddingById = async (weddingId: string) => {
     return null;
   }
 
-  return { id: snap.id, ...(snap.data() as any) } as Wedding;
+  return { id: snap.id, ...snap.data() } as Wedding;
 };

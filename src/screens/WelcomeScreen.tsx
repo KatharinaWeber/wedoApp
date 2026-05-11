@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,7 +14,7 @@ const heroImage =
 
 export default function WelcomeScreen() {
   const nav = useNavigation<WelcomeNavigation>();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: palette.background }]}>

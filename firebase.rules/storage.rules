@@ -3,7 +3,7 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /weddings/{weddingId}/images/{allPaths=**} {
       // Allow upload from guests and photographers
-      allow write: if request.auth != null || request.auth == null; // handled in Firestore metadata and app-layer validation
+      allow write: if true;
       allow read: if true;
     }
   }

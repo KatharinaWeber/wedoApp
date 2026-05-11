@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function Header({ title }: { title: string }) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   return (
     <View style={styles.container}>
       <Text style={[{ color: palette.primary }, typography.heading, styles.title]}>{title}</Text>

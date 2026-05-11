@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -66,7 +66,7 @@ const PHOTOGRAPHER_STEPS = [
 
 export default function InstructionsScreen() {
   const nav = useNavigation();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   const [tab, setTab] = useState<Tab>('guest');
 
   const steps = tab === 'guest' ? GUEST_STEPS : PHOTOGRAPHER_STEPS;

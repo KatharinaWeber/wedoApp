@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 export default function LoadingSpinner({ label = 'Lade WedO' }: { label?: string }) {
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   return (
     <View style={[styles.container, { backgroundColor: palette.background }]}>
       <View style={[styles.card, { borderColor: palette.border, backgroundColor: palette.surface }]}>

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+﻿import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -21,7 +21,7 @@ type ScanState = 'scanning' | 'loading' | 'found' | 'error';
 
 export default function QRScannerScreen() {
   const nav = useNavigation<QRScannerNavigation>();
-  const { palette, typography } = useTheme() as any;
+  const { palette, typography } = useTheme();
   const [scanState, setScanState] = useState<ScanState>('scanning');
   const [wedding, setWedding] = useState<Wedding | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
