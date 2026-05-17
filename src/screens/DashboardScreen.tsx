@@ -1,5 +1,5 @@
 ﻿import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -22,6 +22,9 @@ export default function DashboardScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [dateValue, setDateValue] = useState(new Date());
+  const [draftDate, setDraftDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [location, setLocation] = useState('');
   const nav = useNavigation<DashboardNavigation>();
   const { palette, typography } = useTheme();
@@ -66,6 +69,7 @@ export default function DashboardScreen() {
       setWeddings((current) => [{ ...wedding, photoCount: 0 }, ...current]);
       setTitle('');
       setDate('');
+      setDateValue(new Date());
       setLocation('');
       setShowCreate(false);
     } catch (error) {
@@ -73,6 +77,49 @@ export default function DashboardScreen() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const formatDate = (value: Date) => {
+    return value.toLocaleDateString('de-AT', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const openDatePicker = () => {
+    setDraftDate(dateValue);
+    setShowDatePicker(true);
+  };
+
+  const shiftDraftDate = (days: number) => {
+    setDraftDate((current) => {
+      const next = new Date(current);
+      next.setDate(next.getDate() + days);
+      return next;
+    });
+  };
+
+  const shiftDraftMonth = (months: number) => {
+    setDraftDate((current) => {
+      const next = new Date(current);
+      next.setMonth(next.getMonth() + months);
+      return next;
+    });
+  };
+
+  const shiftDraftYear = (years: number) => {
+    setDraftDate((current) => {
+      const next = new Date(current);
+      next.setFullYear(next.getFullYear() + years);
+      return next;
+    });
+  };
+
+  const confirmDate = () => {
+    setDateValue(draftDate);
+    setDate(formatDate(draftDate));
+    setShowDatePicker(false);
   };
 
   const openGalleryInvites = () => {
@@ -164,13 +211,50 @@ export default function DashboardScreen() {
             onChangeText={setTitle}
             style={[styles.input, typography.body, { borderColor: palette.border, color: palette.primary }]}
           />
-          <TextInput
-            placeholder="21. Oktober 2026"
-            placeholderTextColor={palette.muted}
-            value={date}
-            onChangeText={setDate}
-            style={[styles.input, typography.body, { borderColor: palette.border, color: palette.primary }]}
-          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Datum auswaehlen"
+            onPress={openDatePicker}
+            style={[styles.input, styles.datePickerButton, { borderColor: palette.border }]}
+          >
+            <MaterialIcons name="calendar-today" size={18} color={palette.muted} />
+            <Text style={[styles.datePickerText, typography.body, { color: date ? palette.primary : palette.muted }]}>
+              {date || 'Datum auswaehlen'}
+            </Text>
+          </Pressable>
+          <Modal animationType="fade" transparent visible={showDatePicker} onRequestClose={() => setShowDatePicker(false)}>
+            <View style={styles.dateModalBackdrop}>
+              <View style={[styles.dateModal, { backgroundColor: palette.surface }]}>
+                <View style={styles.dateModalHeader}>
+                  <Text style={[styles.dateModalTitle, typography.subheading, { color: palette.primary }]}>
+                    Datum auswaehlen
+                  </Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Datepicker schliessen"
+                    onPress={() => setShowDatePicker(false)}
+                    style={styles.dateModalClose}
+                  >
+                    <MaterialIcons name="close" size={22} color={palette.primary} />
+                  </Pressable>
+                </View>
+                <View style={[styles.datePreview, { backgroundColor: palette.surfaceSoft }]}>
+                  <Text style={[styles.datePreviewText, typography.heading, { color: palette.primary }]}>
+                    {formatDate(draftDate)}
+                  </Text>
+                </View>
+                <View style={styles.datePickerRows}>
+                  <DateAdjustRow label="Tag" onMinus={() => shiftDraftDate(-1)} onPlus={() => shiftDraftDate(1)} />
+                  <DateAdjustRow label="Monat" onMinus={() => shiftDraftMonth(-1)} onPlus={() => shiftDraftMonth(1)} />
+                  <DateAdjustRow label="Jahr" onMinus={() => shiftDraftYear(-1)} onPlus={() => shiftDraftYear(1)} />
+                </View>
+                <View style={styles.dateModalActions}>
+                  <Button title="Abbrechen" variant="secondary" onPress={() => setShowDatePicker(false)} style={styles.dateActionButton} />
+                  <Button title="Uebernehmen" onPress={confirmDate} style={styles.dateActionButton} />
+                </View>
+              </View>
+            </View>
+          </Modal>
           <TextInput
             placeholder="Location"
             placeholderTextColor={palette.muted}
@@ -211,6 +295,30 @@ export default function DashboardScreen() {
         <MaterialIcons name={icon} size={22} color={palette.accent} />
         <Text style={[styles.statValue, typography.heading, { color: palette.primary }]}>{value}</Text>
         <Text style={[styles.statLabel, typography.label, { color: palette.muted }]}>{label}</Text>
+      </View>
+    );
+  }
+
+  function DateAdjustRow({ label, onMinus, onPlus }: { label: string; onMinus: () => void; onPlus: () => void }) {
+    return (
+      <View style={styles.dateAdjustRow}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${label} verringern`}
+          onPress={onMinus}
+          style={[styles.dateAdjustButton, { borderColor: palette.border }]}
+        >
+          <MaterialIcons name="remove" size={22} color={palette.primary} />
+        </Pressable>
+        <Text style={[styles.dateAdjustLabel, typography.label, { color: palette.primary }]}>{label}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${label} erhoehen`}
+          onPress={onPlus}
+          style={[styles.dateAdjustButton, { borderColor: palette.border }]}
+        >
+          <MaterialIcons name="add" size={22} color={palette.primary} />
+        </Pressable>
       </View>
     );
   }
@@ -345,6 +453,83 @@ const styles = StyleSheet.create({
     fontSize: 15,
     minHeight: 48,
     paddingHorizontal: 14,
+  },
+  datePickerButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  datePickerText: {
+    flex: 1,
+    fontSize: 15,
+  },
+  dateModalBackdrop: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(30, 27, 22, 0.46)',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  dateModal: {
+    borderRadius: 12,
+    maxWidth: 420,
+    padding: 18,
+    width: '100%',
+  },
+  dateModalHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dateModalTitle: {
+    fontSize: 24,
+    lineHeight: 30,
+  },
+  dateModalClose: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
+  },
+  datePreview: {
+    alignItems: 'center',
+    borderRadius: 12,
+    marginTop: 16,
+    padding: 16,
+  },
+  datePreviewText: {
+    fontSize: 24,
+    lineHeight: 30,
+    textAlign: 'center',
+  },
+  datePickerRows: {
+    gap: 10,
+    marginTop: 16,
+  },
+  dateAdjustRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  dateAdjustButton: {
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    height: 48,
+    justifyContent: 'center',
+    width: 64,
+  },
+  dateAdjustLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+  },
+  dateModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 18,
+  },
+  dateActionButton: {
+    flex: 1,
   },
   sectionHeader: {
     alignItems: 'center',

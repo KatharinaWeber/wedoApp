@@ -2,10 +2,17 @@
 import { FlatList, Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../theme/ThemeContext';
+import { Photo } from '../types';
 
 const col = 3;
 
-export default function PhotoGrid({ photos, onDelete }: any) {
+type Props = {
+  photos: Photo[];
+  onPhotoPress?: (photo: Photo) => void;
+  onDelete?: (photo: Photo) => void;
+};
+
+export default function PhotoGrid({ photos, onPhotoPress, onDelete }: Props) {
   const { width } = useWindowDimensions();
   const { palette, typography } = useTheme();
   const size = Math.floor((width - 56) / col);
@@ -29,9 +36,14 @@ export default function PhotoGrid({ photos, onDelete }: any) {
       data={photos}
       numColumns={col}
       scrollEnabled={false}
-      keyExtractor={(i: any) => i.id}
-      renderItem={({ item }: any) => (
-        <Pressable style={styles.tile} onPress={() => {}}>
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <Pressable
+          accessibilityRole="imagebutton"
+          accessibilityLabel="Foto gross anzeigen"
+          style={styles.tile}
+          onPress={() => onPhotoPress?.(item)}
+        >
           <Image source={{ uri: item.imageUrl }} style={[styles.image, { width: size, height: size }]} />
           {onDelete ? (
             <Pressable

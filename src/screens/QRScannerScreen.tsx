@@ -1,10 +1,13 @@
 ﻿import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { CameraView } from 'expo-camera';
@@ -14,6 +17,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getWeddingById, Wedding } from '../services/weddingService';
 import { useTheme } from '../theme/ThemeContext';
 import { RootStackParamList } from '../navigation/RootNavigator';
+import { saveLastGuestWeddingId } from '../utils/guestSession';
 
 type QRScannerNavigation = NativeStackNavigationProp<RootStackParamList, 'QRScanner'>;
 
@@ -25,7 +29,40 @@ export default function QRScannerScreen() {
   const [scanState, setScanState] = useState<ScanState>('scanning');
   const [wedding, setWedding] = useState<Wedding | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualUrl, setManualUrl] = useState('');
   const scannedRef = useRef(false);
+
+  const loadWeddingFromLink = useCallback(async (data: string, invalidMessage: string) => {
+    const match = data.trim().match(/^wedo:\/\/event\/(.+)$/);
+    if (!match) {
+      setErrorMsg(invalidMessage);
+      setScanState('error');
+      return;
+    }
+
+    const weddingId = match[1].trim();
+    if (!weddingId) {
+      setErrorMsg(invalidMessage);
+      setScanState('error');
+      return;
+    }
+
+    try {
+      const result = await getWeddingById(weddingId);
+      if (!result) {
+        setErrorMsg('Dieses Event wurde nicht gefunden. Bitte frage den Fotografen nach dem aktuellen QR-Code.');
+        setScanState('error');
+        return;
+      }
+      await saveLastGuestWeddingId(result.id);
+      setWedding(result);
+      setScanState('found');
+    } catch {
+      setErrorMsg('Verbindung fehlgeschlagen. Bitte pruefe dein WLAN und versuche es erneut.');
+      setScanState('error');
+    }
+  }, []);
 
   const handleBarcode = useCallback(
     async ({ data }: { data: string }) => {
@@ -33,30 +70,9 @@ export default function QRScannerScreen() {
       scannedRef.current = true;
 
       setScanState('loading');
-
-      const match = data.match(/^wedo:\/\/event\/(.+)$/);
-      if (!match) {
-        setErrorMsg('Dieser QR-Code gehoert nicht zu WedO. Bitte scanne den Code vom Hochzeitsfotografen.');
-        setScanState('error');
-        return;
-      }
-
-      const weddingId = match[1];
-      try {
-        const result = await getWeddingById(weddingId);
-        if (!result) {
-          setErrorMsg('Dieses Event wurde nicht gefunden. Bitte frage den Fotografen nach dem aktuellen QR-Code.');
-          setScanState('error');
-          return;
-        }
-        setWedding(result);
-        setScanState('found');
-      } catch {
-        setErrorMsg('Verbindung fehlgeschlagen. Bitte pruefe dein WLAN und versuche es erneut.');
-        setScanState('error');
-      }
+      await loadWeddingFromLink(data, 'Dieser QR-Code gehoert nicht zu WedO. Bitte scanne den Code vom Hochzeitsfotografen.');
     },
-    [],
+    [loadWeddingFromLink],
   );
 
   const retry = () => {
@@ -64,6 +80,17 @@ export default function QRScannerScreen() {
     setErrorMsg('');
     setWedding(null);
     setScanState('scanning');
+  };
+
+  const submitManualUrl = async () => {
+    scannedRef.current = true;
+    setErrorMsg('');
+    setWedding(null);
+    setScanState('loading');
+    await loadWeddingFromLink(
+      manualUrl,
+      'Bitte gib einen WedO-Link im Format wedo://event/DEINE_EVENT_ID ein.',
+    );
   };
 
   if (scanState === 'found' && wedding) {
@@ -160,6 +187,17 @@ export default function QRScannerScreen() {
           </Pressable>
           <Pressable
             accessibilityRole="button"
+            accessibilityLabel="Link manuell eingeben"
+            onPress={() => {
+              retry();
+              setShowManualEntry(true);
+            }}
+            style={({ pressed }) => [styles.secondaryButton, { opacity: pressed ? 0.7 : 1 }]}
+          >
+            <Text style={[styles.secondaryButtonText, { color: palette.muted }]}>Link manuell eingeben</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
             onPress={() => nav.goBack()}
             style={({ pressed }) => [styles.secondaryButton, { opacity: pressed ? 0.7 : 1 }]}
           >
@@ -178,7 +216,12 @@ export default function QRScannerScreen() {
         onBarcodeScanned={scanState === 'scanning' ? handleBarcode : undefined}
       />
 
-      <SafeAreaView style={styles.overlay} pointerEvents="box-none">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+        pointerEvents="box-none"
+        style={styles.overlay}
+      >
         <View style={styles.topBar}>
           <Pressable
             accessibilityRole="button"
@@ -213,8 +256,51 @@ export default function QRScannerScreen() {
           <Text style={styles.hintBody}>
             Halte die Kamera auf den QR-Code, den dir der Fotograf gegeben hat.
           </Text>
+          {!showManualEntry ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="WedO-Link manuell eingeben"
+              onPress={() => setShowManualEntry(true)}
+              style={({ pressed }) => [styles.manualToggle, { opacity: pressed ? 0.72 : 1 }]}
+            >
+              <Text style={styles.manualToggleText}>Kein QR-Code?</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.manualPanel}>
+              <Text style={styles.manualTitle}>Link einfuegen</Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={scanState !== 'loading'}
+                keyboardType="url"
+                onChangeText={setManualUrl}
+                placeholder="wedo://event/..."
+                placeholderTextColor="rgba(250, 248, 245, 0.52)"
+                returnKeyType="go"
+                onSubmitEditing={submitManualUrl}
+                style={styles.manualInput}
+                value={manualUrl}
+              />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="WedO-Link pruefen"
+                disabled={scanState === 'loading' || !manualUrl.trim()}
+                onPress={submitManualUrl}
+                style={({ pressed }) => [
+                  styles.manualSubmit,
+                  { opacity: pressed || scanState === 'loading' || !manualUrl.trim() ? 0.64 : 1 },
+                ]}
+              >
+                {scanState === 'loading' ? (
+                  <ActivityIndicator color="#FAF8F5" />
+                ) : (
+                  <Text style={styles.manualSubmitText}>Event oeffnen</Text>
+                )}
+              </Pressable>
+            </View>
+          )}
         </View>
-      </SafeAreaView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -313,6 +399,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 56,
     paddingHorizontal: 40,
+    width: '100%',
   },
   hintTitle: {
     color: '#FAF8F5',
@@ -326,6 +413,58 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 8,
     textAlign: 'center',
+  },
+  manualToggle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    minHeight: 44,
+    paddingHorizontal: 20,
+  },
+  manualToggleText: {
+    color: '#FAF8F5',
+    fontSize: 14,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+  manualPanel: {
+    backgroundColor: 'rgba(0, 0, 0, 0.58)',
+    borderColor: 'rgba(250, 248, 245, 0.22)',
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 10,
+    marginTop: 16,
+    maxWidth: 360,
+    padding: 14,
+    width: '100%',
+  },
+  manualTitle: {
+    color: '#FAF8F5',
+    fontSize: 13,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  manualInput: {
+    borderColor: 'rgba(250, 248, 245, 0.34)',
+    borderRadius: 12,
+    borderWidth: 1,
+    color: '#FAF8F5',
+    fontSize: 14,
+    minHeight: 48,
+    paddingHorizontal: 12,
+  },
+  manualSubmit: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(197, 160, 89, 0.96)',
+    borderRadius: 12,
+    justifyContent: 'center',
+    minHeight: 48,
+  },
+  manualSubmitText: {
+    color: '#FAF8F5',
+    fontSize: 14,
+    fontWeight: '800',
+    textTransform: 'uppercase',
   },
   frameContainer: {
     flex: 1,

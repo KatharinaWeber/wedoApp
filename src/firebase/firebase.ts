@@ -4,13 +4,17 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+declare const process: {
+  env: Record<string, string | undefined>;
+};
+
 const firebaseConfig = {
-  apiKey: 'AIzaSyBBMPWqWc8lme4iTY1RSTxFcQUxIZ3Qztk',
-  authDomain: 'wedoapp-d11d0.firebaseapp.com',
-  projectId: 'wedoapp-d11d0',
-  storageBucket: 'wedoapp-d11d0.firebasestorage.app',
-  messagingSenderId: '182565192719',
-  appId: '1:182565192719:web:ffe9dbbe29c64be63acf7a',
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig as any);

@@ -17,5 +17,7 @@ export type Photo = {
   weddingId: string;
   uploadedBy: 'guest' | 'photographer';
   imageUrl: string;
+  storagePath?: string;
+  localAssetId?: string | null;
   createdAt: any;
 };

@@ -1,5 +1,7 @@
 import { collection, addDoc, serverTimestamp, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { File, Paths } from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 import { db, storage } from '../firebase/firebase';
 import { Photo } from '../types';
 
@@ -75,8 +77,31 @@ export const deletePhoto = async (photo: { id: string; storagePath?: string }) =
   }
 
   if (photo.storagePath) {
-    await deleteObject(ref(storage, photo.storagePath));
+    try {
+      await deleteObject(ref(storage, photo.storagePath));
+    } catch (error) {
+      console.warn('[photoService] storage delete failed, deleting firestore document anyway', error);
+    }
   }
 
   await deleteDoc(doc(db, 'photos', photo.id));
+};
+
+export const savePhotoToLibrary = async (photo: Pick<Photo, 'id' | 'imageUrl'>) => {
+  if (!photo.imageUrl) {
+    throw new Error('Missing photo URL.');
+  }
+
+  const permission = await MediaLibrary.requestPermissionsAsync();
+
+  if (permission.status !== 'granted') {
+    throw new Error('WedO braucht Zugriff auf deine Galerie, um das Foto zu speichern.');
+  }
+
+  const targetFile = new File(Paths.cache, `wedo-${photo.id}-${Date.now()}.jpg`);
+  const downloadedFile = await File.downloadFileAsync(photo.imageUrl, targetFile, {
+    idempotent: true,
+  });
+
+  return MediaLibrary.createAssetAsync(downloadedFile.uri);
 };

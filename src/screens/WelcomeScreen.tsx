@@ -1,11 +1,13 @@
-﻿import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useTheme } from '../theme/ThemeContext';
 import Button from '../components/Button';
+import { getWeddingById, Wedding } from '../services/weddingService';
+import { clearLastGuestWeddingId, getLastGuestWeddingId } from '../utils/guestSession';
 
 type WelcomeNavigation = NativeStackNavigationProp<RootStackParamList, 'Welcome'>;
 
@@ -15,6 +17,35 @@ const heroImage =
 export default function WelcomeScreen() {
   const nav = useNavigation<WelcomeNavigation>();
   const { palette, typography } = useTheme();
+  const [lastWedding, setLastWedding] = useState<Wedding | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+
+      (async () => {
+        const weddingId = await getLastGuestWeddingId();
+        if (!weddingId) {
+          if (active) setLastWedding(null);
+          return;
+        }
+
+        const wedding = await getWeddingById(weddingId);
+        if (!active) return;
+
+        if (wedding) {
+          setLastWedding(wedding);
+        } else {
+          await clearLastGuestWeddingId();
+          setLastWedding(null);
+        }
+      })();
+
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: palette.background }]}>
@@ -33,6 +64,33 @@ export default function WelcomeScreen() {
       </ImageBackground>
 
       <View style={styles.actions}>
+        {lastWedding ? (
+          <View style={[styles.guestReturn, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+            <View style={styles.guestReturnHeader}>
+              <MaterialIcons name="favorite" size={20} color={palette.accent} />
+              <Text style={[styles.guestReturnLabel, typography.label, { color: palette.accent }]}>
+                Letztes Event
+              </Text>
+            </View>
+            <Text style={[styles.guestReturnTitle, typography.subheading, { color: palette.primary }]}>
+              {lastWedding.title}
+            </Text>
+            <View style={styles.guestReturnActions}>
+              <Button
+                title="Weiter hochladen"
+                onPress={() => nav.navigate('GuestCamera', { weddingId: lastWedding.id })}
+                style={styles.guestReturnButton}
+              />
+              <Button
+                title="Fotos ansehen"
+                variant="secondary"
+                onPress={() => nav.navigate('GuestGallery', { weddingId: lastWedding.id })}
+                style={styles.guestReturnButton}
+              />
+            </View>
+          </View>
+        ) : null}
+
         <Button title="QR-Code scannen" onPress={() => nav.navigate('QRScanner')} />
         <Pressable
           accessibilityRole="button"
@@ -120,6 +178,31 @@ const styles = StyleSheet.create({
     gap: 16,
     padding: 24,
     paddingBottom: 40,
+  },
+  guestReturn: {
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 10,
+    padding: 14,
+  },
+  guestReturnHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  guestReturnLabel: {
+    fontSize: 11,
+    textTransform: 'uppercase',
+  },
+  guestReturnTitle: {
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  guestReturnActions: {
+    gap: 10,
+  },
+  guestReturnButton: {
+    width: '100%',
   },
   loginLink: {
     alignItems: 'center',

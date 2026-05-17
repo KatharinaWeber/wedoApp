@@ -1,4 +1,7 @@
 node_modules
 .expo
+.env
 expo-dev-server.log
 .vscode/
+# Added by code-review-graph
+.code-review-graph/
