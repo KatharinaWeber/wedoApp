@@ -3,8 +3,11 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /weddings/{weddingId}/images/{allPaths=**} {
       // Allow upload from guests and photographers
-      allow write: if true;
+      allow create: if true;
       allow read: if true;
+      allow delete: if request.auth != null
+        && firestore.exists(/databases/(default)/documents/weddings/$(weddingId))
+        && firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.createdBy == request.auth.uid;
     }
   }
 }

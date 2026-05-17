@@ -7,7 +7,7 @@ WedO verbindet Hochzeitsgäste und Fotografen in einer gemeinsamen Galerie. Gäs
 | Rolle | Was ist möglich |
 |---|---|
 | **Gast** | QR-Code scannen → Event-Frame sehen → Fotos aufnehmen → automatisch hochladen |
-| **Fotograf** | Konto erstellen → Events anlegen → QR-Code teilen → Galerie verwalten → Fotos löschen |
+| **Fotograf** | Konto erstellen → Events anlegen → QR-Code teilen → Galerie verwalten → Fotos speichern, teilen und löschen |
 
 ## Tech Stack
 
@@ -74,6 +74,7 @@ WelcomeScreen
       └── Dashboard
             ├── Event öffnen  →  EventDetailScreen
             │     ├── Guest Camera  →  GuestCameraScreen
+            │     ├── Foto-Vorschau  →  Speichern / Teilen / Löschen
             │     └── Einladung teilen  (Share-Sheet)
             └── Anleitung  →  InstructionsScreen
 ```
@@ -99,12 +100,12 @@ firebase.rules/    Firestore + Storage Security Rules
 Alle Firebase-Konfigurationswerte in `.env` (Vorlage: `.env.example`):
 
 ```
-FIREBASE_API_KEY=...
-FIREBASE_AUTH_DOMAIN=...
-FIREBASE_PROJECT_ID=...
-FIREBASE_STORAGE_BUCKET=...
-FIREBASE_MESSAGING_SENDER_ID=...
-FIREBASE_APP_ID=...
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
 ```
 
 Nie echte Schlüssel in das Repository einchecken.
@@ -113,7 +114,8 @@ Nie echte Schlüssel in das Repository einchecken.
 
 - Keine Echtzeit-Updates (Daten werden bei Pull-to-Refresh neu geladen)
 - Keine Offline-Warteschlange für Uploads
-- Gaeste-Fotos werden ohne Authentifizierung hochgeladen (so gewollt)
+- Kein ZIP- oder Bulk-Download; Fotos werden einzeln gespeichert oder geteilt
+- Gäste-Fotos werden ohne Authentifizierung hochgeladen (so gewollt)
 
 ## Lizenz
 

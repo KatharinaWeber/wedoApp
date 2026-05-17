@@ -118,7 +118,7 @@ export default function GuestCameraScreen({ route, navigation }: any) {
       const localAsset = await MediaLibrary.createAssetAsync(photo.uri);
       console.log('[GuestCamera] saved to media library', { localAssetId: localAsset.id });
 
-      const uploadedPhoto = await uploadPhoto(weddingId!, photo.uri, 'guest', { localAssetId: localAsset.id });
+      const uploadedPhoto = await uploadPhoto(weddingId, photo.uri, 'guest', { localAssetId: localAsset.id });
       console.log('[GuestCamera] uploaded to firebase', uploadedPhoto);
 
       setCaptureState('success');
@@ -149,6 +149,12 @@ export default function GuestCameraScreen({ route, navigation }: any) {
   const toggleFlash = async () => {
     await selectionHaptic();
     setFlashMode((current) => (current === 'off' ? 'on' : 'off'));
+  };
+
+  const openGallery = async () => {
+    if (!weddingId) return;
+    await selectionHaptic();
+    navigation.navigate('GuestGallery', { weddingId });
   };
 
   if (!weddingId) {
@@ -276,14 +282,8 @@ export default function GuestCameraScreen({ route, navigation }: any) {
             {isSaving && <ActivityIndicator color={palette.accent} style={styles.spinner} />}
           </View>
 
-          <View style={styles.modeRow}>
-            <Text style={[styles.modeText, styles.modeMuted]}>Video</Text>
-            <Text style={styles.modeText}>Foto</Text>
-            <Text style={[styles.modeText, styles.modeMuted]}>Story</Text>
-          </View>
-
           <View style={styles.captureRow}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Galerie oeffnen" style={styles.sideAction}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Galerie oeffnen" onPress={openGallery} style={styles.sideAction}>
               <Text style={styles.sideActionText}>Galerie</Text>
             </Pressable>
           <Animated.View style={{ transform: [{ scale: shutterScale }] }}>

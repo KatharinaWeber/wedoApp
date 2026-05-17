@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc, getCountFromServer } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, getDoc, getCountFromServer, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
 export type Wedding = {
@@ -51,4 +51,25 @@ export const getWeddingById = async (weddingId: string) => {
   }
 
   return { id: snap.id, ...snap.data() } as Wedding;
+};
+
+export const updateWedding = async (weddingId: string, updates: Partial<Wedding>) => {
+  if (!weddingId) {
+    throw new Error('Missing wedding id.');
+  }
+
+  const sanitizedUpdates: Partial<Wedding> = {};
+  if (updates.title !== undefined) sanitizedUpdates.title = updates.title;
+  if (updates.date !== undefined) sanitizedUpdates.date = updates.date;
+  if (updates.location !== undefined) sanitizedUpdates.location = updates.location;
+
+  if (!Object.keys(sanitizedUpdates).length) {
+    throw new Error('No wedding updates provided.');
+  }
+
+  try {
+    await updateDoc(doc(db, 'weddings', weddingId), sanitizedUpdates);
+  } catch (error: any) {
+    throw new Error(error?.message || 'Wedding could not be updated.');
+  }
 };
