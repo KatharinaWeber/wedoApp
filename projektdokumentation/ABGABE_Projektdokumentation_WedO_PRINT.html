@@ -1,0 +1,99 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Projektdokumentation WedO</title>
+  <style>
+    @page { size: A4; margin: 16mm 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #211f1c;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.2pt;
+      line-height: 1.34;
+    }
+    h1 { margin: 0 0 8px; font-size: 21pt; }
+    h2 { margin: 13px 0 5px; font-size: 13pt; border-bottom: 1px solid #ddd6ca; padding-bottom: 2px; }
+    h3 { margin: 8px 0 3px; font-size: 10.8pt; }
+    p { margin: 4px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 6px 0 8px; font-size: 9.2pt; }
+    th, td { border: 1px solid #d7d0c4; padding: 4px 5px; vertical-align: top; }
+    th { background: #f4efe7; text-align: left; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    pre { margin: 5px 0 7px; padding: 7px 9px; background: #f7f3ee; border: 1px solid #ded6cb; white-space: pre-wrap; font-size: 8.9pt; }
+    .meta { margin-bottom: 8px; padding: 7px 9px; background: #f8f5ef; border-left: 4px solid #8a6f48; }
+    .compact { margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <h1>Projektdokumentation: WedO</h1>
+  <div class="meta">
+    <p><strong>Projekt:</strong> WedO - Wedding Photo Sharing App</p>
+    <p><strong>App-Art:</strong> Native Mobile App für Android/iOS mit Expo React Native</p>
+    <p><strong>Frameworks/Technologien:</strong> React Native, Expo, TypeScript, Firebase Auth, Firestore, Firebase Storage</p>
+    <p><strong>Abgabe:</strong> Projektdokumentation als PDF, maximal 3 A4-Seiten</p>
+  </div>
+
+  <h2>1. Vorstellung der App</h2>
+  <p>WedO ist eine mobile App, mit der Hochzeitsgäste ihre Fotos unkompliziert mit dem Hochzeitsteam bzw. dem Fotografen teilen können. Der Fotograf erstellt in der App ein Event, teilt einen QR-Code oder einen Deep-Link mit den Gästen und verwaltet danach alle hochgeladenen Fotos in einer gemeinsamen Galerie.</p>
+  <p>Die App löst ein typisches Problem bei Hochzeiten: Fotos entstehen auf vielen privaten Smartphones, werden aber später oft nur teilweise oder über verschiedene Messenger geteilt. WedO bündelt diese Fotos pro Event an einem Ort. Gäste benötigen keinen Account, sondern scannen den QR-Code, bestätigen das Event und können sofort Fotos aufnehmen oder die Event-Galerie ansehen. Fotografen registrieren sich mit E-Mail und Passwort, erstellen Events und verwalten die hochgeladenen Inhalte.</p>
+
+  <h2>2. Requirements und Umsetzung</h2>
+  <h3>CRUD-Operationen</h3>
+  <table>
+    <tr><th>Operation</th><th>Umsetzung in WedO</th></tr>
+    <tr><td>Create</td><td>Fotograf erstellt ein Hochzeits-Event; Gast oder Fotograf lädt ein Foto hoch.</td></tr>
+    <tr><td>Read</td><td>Events, Event-Details und Fotos werden aus Firestore gelesen und in Dashboard, Detailseite und Galerie angezeigt.</td></tr>
+    <tr><td>Update</td><td>Fotograf kann Event-Daten wie Titel, Datum und Location bearbeiten.</td></tr>
+    <tr><td>Delete</td><td>Fotograf kann Fotos aus der Galerie löschen; dabei werden Firestore-Dokument und Storage-Datei entfernt bzw. bereinigt.</td></tr>
+  </table>
+
+  <h3>Persistierende Daten</h3>
+  <p>WedO nutzt Firebase als persistierende Datenbasis. Firestore speichert strukturierte Daten, Firebase Storage speichert die Bilddateien. Firebase Auth verwaltet die Fotografen-Accounts. Zusätzlich wird lokal per AsyncStorage das zuletzt gescannte Event gespeichert, damit Gäste beim naechsten App-Start schneller zurückkehren können.</p>
+  <table>
+    <tr><th>Collection / Speicherort</th><th>Inhalt</th></tr>
+    <tr><td><code>weddings</code></td><td>Event-Titel, Ersteller, Share-Code, Datum, Location, Erstellzeitpunkt</td></tr>
+    <tr><td><code>photos</code></td><td>Event-ID, Bild-URL, Storage-Pfad, Upload-Rolle, Erstellzeitpunkt</td></tr>
+    <tr><td>Firebase Storage</td><td>Bilddateien unter <code>weddings/{weddingId}/images/...jpg</code></td></tr>
+  </table>
+
+  <h3>Auswahlkriterium: Share-Dialog</h3>
+  <p>Als drittes Kriterium wurde der Share-Dialog umgesetzt. Fotografen können die Einladung zum Event über den nativen Share-Dialog des Smartphones teilen. Auch einzelne Fotos können aus der Galerie heraus geteilt werden. Dadurch fühlt sich die App wie eine echte mobile Anwendung an und nutzt die nativen Funktionen des Betriebssystems.</p>
+
+  <h2>3. Begründung der App-Art und des Frameworks</h2>
+  <p>WedO wurde bewusst als Mobile App und nicht als Web-App umgesetzt, weil der zentrale Use Case direkt auf dem Smartphone stattfindet: Gäste fotografieren während einer Hochzeit, scannen QR-Codes, speichern Bilder in der lokalen Galerie und teilen Inhalte über native Smartphone-Funktionen. Diese Anforderungen passen besonders gut zu einer nativen bzw. cross-platform mobilen App.</p>
+  <p>React Native mit Expo wurde gewählt, weil damit eine App für Android und iOS mit einer gemeinsamen Codebasis entwickelt werden kann. Expo vereinfacht typische Mobile-Funktionen wie Kamera, Media Library, Haptics, Clipboard und QR-Code-Flows. TypeScript sorgt für klarere Datenstrukturen und weniger Fehler bei Services, Navigation und Komponenten. Firebase passt gut zum MVP, weil Authentifizierung, Datenbank und Dateispeicher ohne eigenes Backend bereitgestellt werden.</p>
+
+  <h2>4. Mockup und Funktionsweise</h2>
+  <pre>Start
+  |-- QR-Code scannen (Gast)
+  |     |-- Event bestätigen
+  |     |-- Foto aufnehmen
+  |     |-- Foto hochladen
+  |     |-- Event-Galerie ansehen
+  |
+  |-- Fotografen-Login
+        |-- Dashboard
+        |-- Event erstellen
+        |-- Event-Detailseite
+              |-- QR-Code / Link teilen
+              |-- Fotos ansehen
+              |-- Event bearbeiten
+              |-- Fotos speichern, teilen oder löschen</pre>
+  <p><strong>Startscreen:</strong> Der Nutzer entscheidet zwischen Gast-Flow und Fotografen-Login. Wenn ein Gast bereits ein Event gescannt hat, wird dieses Event erneut angeboten.</p>
+  <p><strong>QR-Scanner:</strong> Gäste scannen den Event-Code oder geben einen Link manuell ein. Danach wird das Event geladen und bestätigt.</p>
+  <p><strong>Gast-Kamera:</strong> Die App fragt Kamera- und Galerie-Berechtigungen an, nimmt Fotos auf, speichert sie lokal und lädt sie in Firebase hoch.</p>
+  <p><strong>Dashboard:</strong> Fotografen sehen ihre Events, legen neue Hochzeiten an und öffnen die Detailansicht.</p>
+  <p><strong>Event-Detailseite:</strong> Der Fotograf sieht QR-Code, Share-Link und Galerie. Fotos können geöffnet, gespeichert, geteilt oder geloescht werden.</p>
+
+  <h2>5. Learnings</h2>
+  <p><strong>Was lief gut?</strong> Die Kombination aus Expo und Firebase hat die Entwicklung eines funktionsfähigen MVPs stark beschleunigt. Besonders Kamera, Galerie, QR-Code, Authentifizierung und Cloud-Speicher ließen sich gut in einzelne Services und Screens aufteilen. Auch die Rollenlogik zwischen Gast und Fotograf war für die Demo gut nachvollziehbar.</p>
+  <p><strong>Was lief schlecht?</strong> Einige native Funktionen benötigten genaue Berechtigungen und mussten auf echten Geräten getestet werden. Firebase-Regeln und Storage-Löschvorgänge waren fehleranfälliger als einfache Lese- und Schreiboperationen. Außerdem musste darauf geachtet werden, dass UI-Platzhalter nicht wie fertige Funktionen wirken.</p>
+  <p><strong>Was würden wir beim naechsten Mal anders machen?</strong> Beim naechsten Projekt würden wir früher ein klares Datenmodell und Security-Konzept festlegen, Tests für die wichtigsten Services ergänzen und den Upload-Prozess robuster gestalten. Sinnvoll wären ausserdem Offline-Upload-Queue, Bulk-Download für Fotografen und eine Moderationsfunktion, bevor Fotos für alle sichtbar sind.</p>
+
+  <h2>6. Fazit</h2>
+  <p>WedO erfüllt die geforderten Kriterien: Die App besitzt CRUD-Funktionen, speichert Daten persistent in Firebase und nutzt den nativen Share-Dialog. Die App-Art und das Framework passen zum Anwendungsfall, da Hochzeitsfotos direkt mobil aufgenommen, gespeichert und geteilt werden. Das Projekt zeigt einen realistischen MVP für eine Event-basierte Foto-Sharing-App.</p>
+</body>
+</html>
+

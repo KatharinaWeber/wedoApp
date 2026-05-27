@@ -1,0 +1,797 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WedO - Abschlusspräsentation</title>
+  <style>
+    :root {
+      --ink: #211f1d;
+      --muted: #6b6259;
+      --paper: #fffaf3;
+      --panel: #ffffff;
+      --line: #e4d8ca;
+      --rose: #c85d70;
+      --teal: #137d78;
+      --gold: #b88a36;
+      --plum: #5d4a66;
+      --soft: #f2eadf;
+      --shadow: 0 24px 70px rgba(44, 35, 27, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(200, 93, 112, .16), transparent 30%),
+        radial-gradient(circle at 90% 18%, rgba(19, 125, 120, .14), transparent 28%),
+        linear-gradient(135deg, #fffaf3 0%, #f5efe5 46%, #fff8ef 100%);
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+    }
+
+    .deck {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    .topbar, .bottombar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(33, 31, 29, .18);
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .progress {
+      width: min(360px, 28vw);
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(33, 31, 29, .1);
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--rose), var(--teal), var(--gold));
+      transition: width .25s ease;
+    }
+
+    .stage {
+      position: relative;
+      max-width: 1320px;
+      width: 100%;
+      min-height: 0;
+      margin: 0 auto;
+      border: 1px solid rgba(139, 111, 72, .28);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: clamp(26px, 4vw, 64px);
+      overflow: hidden;
+    }
+
+    .slide.active {
+      display: grid;
+      animation: enter .28s ease both;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .two {
+      grid-template-columns: minmax(0, 1fr) minmax(360px, .78fr);
+      gap: clamp(28px, 5vw, 70px);
+      align-items: center;
+    }
+
+    .center {
+      place-items: center;
+      text-align: center;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+      align-content: center;
+    }
+
+    .kicker {
+      margin: 0 0 10px;
+      color: var(--teal);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 980px;
+      font-size: clamp(56px, 9vw, 116px);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      max-width: 920px;
+      font-size: clamp(34px, 5.2vw, 74px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: clamp(20px, 2.2vw, 30px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 780px;
+      color: var(--muted);
+      font-size: clamp(18px, 2vw, 26px);
+      line-height: 1.35;
+    }
+
+    .big-number {
+      color: var(--rose);
+      font-size: clamp(72px, 13vw, 172px);
+      font-weight: 900;
+      line-height: .82;
+      letter-spacing: 0;
+    }
+
+    .pillrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      min-height: 128px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .86);
+      box-shadow: 0 10px 30px rgba(44, 35, 27, .08);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .card p, .card li {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.38;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 21px;
+    }
+
+    li + li { margin-top: 8px; }
+
+    .flow {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+    }
+
+    .bubble {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .phone {
+      width: min(330px, 100%);
+      aspect-ratio: 9 / 18.5;
+      margin: 0 auto;
+      padding: 14px;
+      border-radius: 34px;
+      background: #1f1d1b;
+      box-shadow: 0 24px 70px rgba(33, 31, 29, .22);
+    }
+
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #fffaf3, #f1e5d4);
+      border: 1px solid rgba(255,255,255,.25);
+      position: relative;
+      padding: 18px;
+    }
+
+    .phone-title {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .phone-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .phone-button {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .mini-card {
+      margin-top: 14px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+    }
+
+    .qr {
+      width: 142px;
+      height: 142px;
+      margin: 18px auto 8px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      padding: 9px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .qr span { background: #1f1d1b; border-radius: 2px; }
+    .qr span:nth-child(2n), .qr span:nth-child(5n) { opacity: .18; }
+    .qr span:nth-child(7n), .qr span:nth-child(11n) { opacity: 1; }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-top: 16px;
+    }
+
+    .photo {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(200, 93, 112, .38), rgba(19, 125, 120, .28)),
+        linear-gradient(45deg, #ffe1d4, #f7c5b3);
+    }
+
+    .arch {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .arch .card {
+      min-height: 210px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .tag {
+      width: fit-content;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(19, 125, 120, .12);
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .timebox {
+      min-height: 140px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+    }
+
+    .timebox span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--rose);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .timebox p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .navbtn {
+      min-width: 42px;
+      height: 42px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .navbtn:hover {
+      background: #fff;
+      border-color: rgba(33, 31, 29, .22);
+    }
+
+    .notes {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+      color: var(--muted);
+      font-size: 14px;
+      display: none;
+    }
+
+    .notes.visible { display: block; }
+
+    .accent-rose { color: var(--rose); }
+    .accent-teal { color: var(--teal); }
+    .accent-gold { color: var(--gold); }
+    .accent-plum { color: var(--plum); }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .deck {
+        min-height: 100vh;
+        height: auto;
+        padding: 12px;
+      }
+      .stage {
+        min-height: 760px;
+      }
+      .slide {
+        padding: 24px;
+        overflow: auto;
+      }
+      .slide.active, .two {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      .grid.cols-2, .grid.cols-3, .grid.cols-4, .arch, .timeline {
+        grid-template-columns: 1fr;
+      }
+      .meta .progress { display: none; }
+      .phone { max-width: 280px; }
+      h1 { font-size: clamp(46px, 18vw, 78px); }
+      h2 { font-size: clamp(34px, 11vw, 54px); }
+    }
+
+    @media print {
+      html, body { height: auto; overflow: visible; background: #fff; }
+      .deck { display: block; height: auto; padding: 0; }
+      .topbar, .bottombar, .notes { display: none !important; }
+      .stage { border: 0; box-shadow: none; overflow: visible; }
+      .slide, .slide.active {
+        position: static;
+        display: grid !important;
+        min-height: 100vh;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">W</div>
+        <span>WedO Abschlusspräsentation</span>
+      </div>
+      <div class="meta">
+        <span id="counter">1 / 12</span>
+        <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+      </div>
+    </header>
+
+    <section class="stage" aria-live="polite">
+      <article class="slide active center" data-notes="Startet mit dem Problem: Auf Hochzeiten entstehen viele Fotos, aber sie landen verstreut in Chats und privaten Galerien. WedO sammelt sie pro Event.">
+        <div class="stack">
+          <p class="kicker">Mobile App · Expo React Native · Firebase</p>
+          <h1>WedO</h1>
+          <p class="lead">Eine Hochzeitsfoto-App, mit der Gäste per QR-Code Fotos in eine gemeinsame Event-Galerie hochladen.</p>
+          <div class="pillrow" style="justify-content:center">
+            <span class="pill">CRUD</span>
+            <span class="pill">Persistente Daten</span>
+            <span class="pill">Share-Dialog</span>
+            <span class="pill">Keine Web-App</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Die Kernmotivation klar und kurz halten: viele Bilder, viele Kanäle, kein zentraler Ort.">
+        <div class="stack">
+          <p class="kicker">Problem</p>
+          <h2>Die besten Fotos verschwinden oft in privaten Chats.</h2>
+          <p class="lead">Bei Hochzeiten fotografieren fast alle Gäste. Für Brautpaar und Fotograf ist es aber mühsam, diese Bilder später vollständig einzusammeln.</p>
+        </div>
+        <div class="grid">
+          <div class="card"><strong>Verstreute Kanäle</strong><p>WhatsApp, AirDrop, private Galerien und Cloud-Links liegen nebeneinander.</p></div>
+          <div class="card"><strong>Hohe Einstiegshürde</strong><p>Registrierung oder komplizierte Freigaben bremsen Gäste während des Events.</p></div>
+          <div class="card"><strong>Wenig Kontrolle</strong><p>Fotografen brauchen eine einfache Übersicht über Event und Galerie.</p></div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Hier die Lösung als Rollenmodell erklären: Gast ohne Login, Fotograf mit Dashboard.">
+        <div class="stack">
+          <p class="kicker">Lösung</p>
+          <h2>QR-Code scannen, Foto aufnehmen, gemeinsam sammeln.</h2>
+          <p class="lead">WedO trennt bewusst den schnellen Gast-Flow vom geschützten Fotografenbereich.</p>
+          <div class="pillrow">
+            <span class="pill">Gast ohne Login</span>
+            <span class="pill">Fotograf mit Account</span>
+            <span class="pill">Event-basierte Galerie</span>
+          </div>
+        </div>
+        <div class="phone" aria-label="WedO App Mockup">
+          <div class="screen">
+            <div class="phone-title">WedO</div>
+            <div class="phone-sub">Anna & Markus · 31.05.2026 · Wien</div>
+            <div class="phone-button">QR-Code scannen</div>
+            <div class="mini-card">
+              <strong>Letztes Event</strong>
+              <p class="phone-sub">Weiter hochladen oder Galerie öffnen</p>
+            </div>
+            <div class="photo-grid">
+              <div class="photo"></div><div class="photo"></div><div class="photo"></div>
+              <div class="photo"></div><div class="photo"></div><div class="photo"></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-notes="Diese Folie zeigt, dass ihr über Nutzer nachgedacht habt. Nicht zu lange, nur je eine zentrale Erwartung.">
+        <div class="stack">
+          <p class="kicker">Zielgruppen & Personas</p>
+          <h2>Drei Perspektiven, ein gemeinsamer Moment.</h2>
+          <div class="grid cols-3">
+            <div class="card"><strong>Sarah, Fotografin</strong><p>Möchte Events anlegen, QR-Codes teilen und Fotos zentral verwalten.</p></div>
+            <div class="card"><strong>Lukas, Gast</strong><p>Will ohne Registrierung schnell Fotos hochladen und die Galerie sehen.</p></div>
+            <div class="card"><strong>Anna & Markus</strong><p>Wollen möglichst viele Erinnerungen aus verschiedenen Blickwinkeln sammeln.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Den Gast-Flow am besten als Demo erzählen: öffnen, scannen, bestätigen, Foto aufnehmen, Galerie ansehen.">
+        <div class="stack">
+          <p class="kicker">User Journey Gast</p>
+          <h2>So wenig Reibung wie möglich.</h2>
+          <div class="flow">
+            <div class="flow-step"><div class="bubble">1</div><p>QR-Code scannen oder Link manuell eingeben.</p></div>
+            <div class="flow-step"><div class="bubble">2</div><p>Event bestätigen und Kamera öffnen.</p></div>
+            <div class="flow-step"><div class="bubble">3</div><p>Foto aufnehmen, lokal speichern und hochladen.</p></div>
+            <div class="flow-step"><div class="bubble">4</div><p>Event-Galerie ansehen, Fotos speichern oder teilen.</p></div>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="screen">
+            <div class="phone-title">Gast</div>
+            <div class="qr">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="phone-button">Fotos aufnehmen</div>
+            <div class="mini-card"><strong>wedo://event/abc123</strong><p class="phone-sub">Event gefunden</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Hier zeigen, dass der Fotograf die verwaltende Rolle hat: Login, Dashboard, Event, Share, Galerie.">
+        <div class="stack">
+          <p class="kicker">User Journey Fotograf</p>
+          <h2>Vom Event zur verwaltbaren Galerie.</h2>
+          <div class="flow">
+            <div class="flow-step"><div class="bubble">1</div><p>Registrieren oder einloggen.</p></div>
+            <div class="flow-step"><div class="bubble">2</div><p>Hochzeits-Event mit Datum und Location erstellen.</p></div>
+            <div class="flow-step"><div class="bubble">3</div><p>QR-Code oder Link mit Gästen teilen.</p></div>
+            <div class="flow-step"><div class="bubble">4</div><p>Fotos ansehen, speichern, teilen oder löschen.</p></div>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="screen">
+            <div class="phone-title">Dashboard</div>
+            <div class="phone-sub">3 Events · 128 Fotos</div>
+            <div class="mini-card"><strong>Anna & Markus</strong><p class="phone-sub">42 Fotos · Wien</p></div>
+            <div class="mini-card"><strong>Lisa & Tom</strong><p class="phone-sub">31 Fotos · Graz</p></div>
+            <div class="phone-button">Neues Event</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-notes="Diese Folie ist wichtig für die Bewertung: die Kriterien direkt abhaken.">
+        <div class="stack">
+          <p class="kicker">Requirements</p>
+          <h2>Die Uni-Kriterien sind direkt im Produkt sichtbar.</h2>
+          <div class="grid cols-3">
+            <div class="card"><span class="tag">CRUD</span><strong>Create · Read · Update · Delete</strong><p>Events erstellen/lesen/bearbeiten, Fotos hochladen/anzeigen/löschen.</p></div>
+            <div class="card"><span class="tag">Daten</span><strong>Persistente Speicherung</strong><p>Firestore für Metadaten, Firebase Storage für Bilddateien, Firebase Auth für Accounts.</p></div>
+            <div class="card"><span class="tag">Mobile</span><strong>Share-Dialog</strong><p>Einladungen und einzelne Fotos werden über das native Share-Sheet geteilt.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-notes="Bei CRUD ruhig konkrete Beispiele nennen: Event erstellen, Fotos lesen, Event bearbeiten, Foto löschen.">
+        <div class="stack">
+          <p class="kicker">CRUD-Abdeckung</p>
+          <h2>CRUD ist nicht abstrakt, sondern Teil der Demo.</h2>
+          <div class="grid cols-4">
+            <div class="card"><strong class="accent-teal">Create</strong><p>Event anlegen und Foto hochladen.</p></div>
+            <div class="card"><strong class="accent-gold">Read</strong><p>Dashboard, Event-Details und Galerie anzeigen.</p></div>
+            <div class="card"><strong class="accent-plum">Update</strong><p>Titel, Datum und Location bearbeiten.</p></div>
+            <div class="card"><strong class="accent-rose">Delete</strong><p>Foto aus Storage und Firestore entfernen.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-notes="Architektur knapp erklären. Kein Backend selbst gebaut, Firebase übernimmt Auth, DB und Storage.">
+        <div class="stack">
+          <p class="kicker">Architektur</p>
+          <h2>Eine mobile App, Firebase als Backend.</h2>
+          <div class="arch">
+            <div class="card"><span class="tag">App</span><strong>Expo React Native</strong><p>Screens, Navigation, Kamera, Media Library, Clipboard, Haptics und Share-Dialog.</p></div>
+            <div class="card"><span class="tag">Services</span><strong>TypeScript Services</strong><p>weddingService für Events, photoService für Upload, Galerie und Löschen.</p></div>
+            <div class="card"><span class="tag">Cloud</span><strong>Firebase</strong><p>Auth für Fotografen, Firestore für Daten, Storage für Fotos.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Framework-Entscheidung begründen: Smartphone-Kontext, Kamera, QR, Galerie, native APIs.">
+        <div class="stack">
+          <p class="kicker">App-Art & Framework</p>
+          <h2>Warum Mobile App mit Expo?</h2>
+          <p class="lead">Der Haupt-Use-Case passiert direkt am Smartphone: Kamera öffnen, QR-Code scannen, Fotos speichern und Inhalte teilen.</p>
+        </div>
+        <div class="grid">
+          <div class="card"><strong>Keine Web-App</strong><p>Die Aufgabenstellung verlangt eine App-Art außerhalb einer Web-App.</p></div>
+          <div class="card"><strong>Expo beschleunigt MVPs</strong><p>Viele native Funktionen sind als stabile Module verfügbar.</p></div>
+          <div class="card"><strong>Firebase spart Backend-Zeit</strong><p>Auth, Datenbank und Storage kommen aus einer Plattform.</p></div>
+        </div>
+      </article>
+
+      <article class="slide" data-notes="Diese Timeline passt gut für die 15 Minuten und kann als roter Faden verwendet werden.">
+        <div class="stack">
+          <p class="kicker">Präsentationsablauf</p>
+          <h2>Vorschlag für 15 Minuten.</h2>
+          <div class="timeline">
+            <div class="timebox"><span>0-2 min</span><p>Problem und Idee</p></div>
+            <div class="timebox"><span>2-4 min</span><p>App-Art, Tech Stack</p></div>
+            <div class="timebox"><span>4-7 min</span><p>Fotografen-Flow</p></div>
+            <div class="timebox"><span>7-10 min</span><p>Gast-Flow</p></div>
+            <div class="timebox"><span>10-13 min</span><p>CRUD, Datenmodell, Share</p></div>
+            <div class="timebox"><span>13-15 min</span><p>Learnings und Fazit</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide two" data-notes="Authentisch bleiben: Was lief gut, was war schwierig, was wäre nächstes Mal besser.">
+        <div class="stack">
+          <p class="kicker">Learnings</p>
+          <h2>Was wir aus dem Projekt mitnehmen.</h2>
+          <p class="lead">Der MVP funktioniert, aber native Berechtigungen und Cloud-Regeln brauchen mehr Aufmerksamkeit, als man am Anfang denkt.</p>
+        </div>
+        <div class="grid">
+          <div class="card"><strong>Gut gelaufen</strong><p>Expo und Firebase haben Kamera, Auth, Galerie und persistente Daten schnell möglich gemacht.</p></div>
+          <div class="card"><strong>Schwierig</strong><p>Berechtigungen, Firebase Rules und Storage-Löschvorgänge mussten genauer getestet werden.</p></div>
+          <div class="card"><strong>Nächstes Mal</strong><p>Früheres Datenmodell, mehr Service-Tests, Offline-Queue und Moderation einplanen.</p></div>
+        </div>
+      </article>
+
+      <article class="slide center" data-notes="Am Ende noch einmal die drei Kriterien nennen und dann zur Live-Demo oder zu Fragen wechseln.">
+        <div class="stack">
+          <p class="kicker">Fazit</p>
+          <h2>WedO erfüllt die Anforderungen und zeigt einen realistischen Mobile-MVP.</h2>
+          <div class="pillrow" style="justify-content:center">
+            <span class="pill">CRUD umgesetzt</span>
+            <span class="pill">Firebase-Datenhaltung</span>
+            <span class="pill">Nativer Share-Dialog</span>
+            <span class="pill">QR-Code-Gastflow</span>
+          </div>
+          <p class="lead" style="margin-inline:auto">Danke. Jetzt zeigen wir die App im Demo-Flow.</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="bottombar">
+      <div class="controls">
+        <button class="navbtn" id="prev" aria-label="Vorherige Folie">←</button>
+        <button class="navbtn" id="next" aria-label="Nächste Folie">→</button>
+        <button class="navbtn" id="notesToggle" aria-label="Notizen ein- oder ausblenden">Notizen</button>
+      </div>
+      <div class="meta">Pfeiltasten · Leertaste · F für Vollbild · N für Notizen</div>
+    </footer>
+
+    <aside class="notes" id="notes"></aside>
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.querySelector("#counter");
+    const progress = document.querySelector("#progress");
+    const notes = document.querySelector("#notes");
+    const prev = document.querySelector("#prev");
+    const next = document.querySelector("#next");
+    const notesToggle = document.querySelector("#notesToggle");
+    let current = 0;
+
+    function show(index) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("active", slideIndex === current);
+      });
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      notes.textContent = slides[current].dataset.notes || "";
+      window.location.hash = `folie-${current + 1}`;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+
+    prev.addEventListener("click", () => show(current - 1));
+    next.addEventListener("click", () => show(current + 1));
+    notesToggle.addEventListener("click", () => notes.classList.toggle("visible"));
+
+    document.addEventListener("keydown", (event) => {
+      const key = event.key.toLowerCase();
+      if (key === "arrowright" || key === " " || key === "pagedown") {
+        event.preventDefault();
+        show(current + 1);
+      }
+      if (key === "arrowleft" || key === "pageup") {
+        event.preventDefault();
+        show(current - 1);
+      }
+      if (key === "home") show(0);
+      if (key === "end") show(slides.length - 1);
+      if (key === "f") toggleFullscreen();
+      if (key === "n") notes.classList.toggle("visible");
+    });
+
+    const match = window.location.hash.match(/folie-(\d+)/);
+    show(match ? Number(match[1]) - 1 : 0);
+  </script>
+</body>
+</html>
+
+
